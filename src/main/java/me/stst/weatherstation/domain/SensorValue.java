@@ -1,6 +1,11 @@
 package me.stst.weatherstation.domain;
 
+import me.stst.weatherstation.repository.SensorMeasurementDAO;
+import me.stst.weatherstation.repository.SensorMeasurementRTDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "sensor_values", uniqueConstraints = {@UniqueConstraint(columnNames = {"sv_name","s_id"})})
@@ -61,5 +66,18 @@ public class SensorValue {
 
     public void setSensor(Sensor sensor) {
         this.sensor = sensor;
+    }
+
+    public SensorMeasurement getLatestMeasurement( SensorMeasurementDAO sensorMeasurementDAO, SensorMeasurementRTDAO sensorMeasurementRTDAO){
+        List<SensorMeasurementRT> sensorMeasurementRT=sensorMeasurementRTDAO.findLatestBySensorValue(this);
+        if (sensorMeasurementRT.size()==0){
+            List<SensorMeasurement> measurement=sensorMeasurementDAO.findLatestBySensorValue(this);
+            if (measurement.size()>0){
+                return measurement.get(0);
+            }
+        }else{
+            return sensorMeasurementRT.get(0).copyToSensorMeasurement();
+        }
+        return null;
     }
 }

@@ -1,28 +1,20 @@
 package me.stst.weatherstation.repository;
 
+import me.stst.weatherstation.domain.Sensor;
 import me.stst.weatherstation.domain.SensorValue;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.util.List;
+import java.util.Optional;
 
-public class SensorValueDAO extends BaseDAO {
-
-    public SensorValueDAO(EntityManager em) {
-        super(em);
-    }
-
-    public SensorValue findById(int id){
-        SensorValue ret=null;
-        TypedQuery<SensorValue> typedQuery=em.createQuery("select sv from SensorValue sv where sv.id=:id",getBaseClass());
-        typedQuery.setParameter("id",id);
-        if (typedQuery.getResultList().size()>0){
-            ret=typedQuery.getSingleResult();
-        }
-        return ret;
-    }
+public interface SensorValueDAO extends JpaRepository<SensorValue,Integer> {
 
     @Override
-    public Class getBaseClass() {
-        return SensorValue.class;
-    }
+    Optional<SensorValue> findById(Integer integer);
+
+    SensorValue findByName(String name);
+
+    List<SensorValue> findAllBySensor(Sensor sensor);
 }

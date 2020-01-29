@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="/fragments/app.html :: head"/>
+</head>
+<body>
+<div th:replace="/fragments/app.html :: navbar"></div>
+<div class="container">
+    <div th:replace="/device/_device_list.html :: device_table"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block th:fragment="chart">
+    <canvas id="myChart" width="1600" height="900"></canvas>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            var myChart = new Chart($("#myChart"), {
+                type: 'line',
+                data: {
+                    labels: [(${chart_labels})],
+                    datasets: [{
+                        label: "",
+                        data: [(${chart_data})]
+                    }]
+                }
+            });
+        })
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

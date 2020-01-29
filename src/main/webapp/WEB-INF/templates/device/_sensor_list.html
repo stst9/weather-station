@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table th:fragment="sensor_table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Model</th>
+        <th>ID</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="sensor : ${sensors}">
+        <td><a th:text="${sensor.name}" th:href="@{/sensor/{id}(id=${sensor.id})}"></a></td>
+        <td th:text="${sensor.model}"></td>
+        <td th:text="${sensor.id}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

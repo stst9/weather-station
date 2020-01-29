@@ -9,6 +9,10 @@ import me.stst.weatherstation.rest.model.RestSensorMeasurement;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -18,44 +22,42 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 
-@Path("sensor_measurement")
+//@Path("sensor_measurement")
+@Controller
+@Deprecated
 public class SensorMeasurementController {
-    private SessionFactory sessionFactory= MainStorage.getInstance().getSessionFactory();
-
+    //private SessionFactory sessionFactory= MainStorage.getInstance().getSessionFactory();
+    @Autowired
+    private SensorValueDAO sensorValueDAO;
+    @Autowired
+    private SensorMeasurementDAO sensorMeasurementDAO;
     @GET
     public Response getBySensorValue(){
         return Response.ok().build();
     }
 
-    @POST
+    //@POST
+    @Transactional
     public Response newSensorValue(RestSensorMeasurement in){
         Response ret= Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        Session em=sessionFactory.openSession();
-        Transaction transaction=em.beginTransaction();
         try {
-            SensorValueDAO valueDAO=new SensorValueDAO(em);
-            SensorValue sensorValue=valueDAO.findById(in.getSensorValueId());
-            if (sensorValue!=null){
+            Optional<SensorValue> sensorValueOpt=sensorValueDAO.findById(in.getSensorValueId());
+            if (sensorValueOpt.isPresent()){
                 SensorMeasurement sensorMeasurement=new SensorMeasurement();
-                sensorMeasurement.setSensorValue(sensorValue);
+                sensorMeasurement.setSensorValue(sensorValueOpt.get());
                 sensorMeasurement.setDatetime(new Date(in.getTimestamp()));
                 sensorMeasurement.setValue(in.getValue());
                 sensorMeasurement.setTimezone(TimeZone.getDefault().getRawOffset()/60000);
-                em.persist(sensorMeasurement);
-                em.getTransaction().commit();
+                sensorMeasurementDAO.save(sensorMeasurement);
                 ret= Response.ok().build();
             }else {
                 ret= Response.status(404).build();
             }
         }finally {
-            try {
-                em.getTransaction().rollback();
-            }catch (Exception e){}
-            try {
-                em.close();
-            }catch (Exception e){}
+
         }
         return ret;
 

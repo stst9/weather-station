@@ -1,5 +1,6 @@
 package me.stst.weatherstation.domain;
 
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -7,9 +8,9 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "sensor_measurements",indexes = {@Index(columnList = "sm_datetime")})
-@IdClass(SensorMeasurement.SensorMeasurementId.class)
-public class SensorMeasurement {
+@Table(name = "sensor_measurements_rt")
+@IdClass(SensorMeasurementRT.SensorMeasurementId.class)
+public class SensorMeasurementRT{
 
     @Id
     @ManyToOne
@@ -28,6 +29,15 @@ public class SensorMeasurement {
     @Id
     @Column(name = "sm_value",precision = 12,scale = 4)
     private BigDecimal value;
+
+    public SensorMeasurement copyToSensorMeasurement(){
+        SensorMeasurement ret=new SensorMeasurement();
+        ret.setTimezone(timezone);
+        ret.setDatetime(datetime);
+        ret.setValue(value);
+        ret.setSensorValue(sensorValue);
+        return ret;
+    }
 
     public SensorValue getSensorValue() {
         return sensorValue;
@@ -71,7 +81,7 @@ public class SensorMeasurement {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            SensorMeasurementId that = (SensorMeasurementId) o;
+            SensorMeasurementRT.SensorMeasurementId that = (SensorMeasurementRT.SensorMeasurementId) o;
             return timezone == that.timezone &&
                     sensorValue==that.sensorValue &&
                     datetime.equals(that.datetime) &&
@@ -83,4 +93,5 @@ public class SensorMeasurement {
             return Objects.hash(sensorValue, datetime, timezone, value);
         }
     }
+
 }

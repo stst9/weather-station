@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table th:fragment="sensor_value_table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Latest measurement</th>
+        <th>Unit</th>
+        <th>ID</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="sensor_value : ${sensor_values}">
+        <td><a th:text="${sensor_value.name}" th:href="@{/sensor_value/{id}(id=${sensor_value.id})}"></a></td>
+        <td>
+            <th:block th:if="${latest_measurements.get(sensor_value.id)!=null}"
+                      th:text="|${latest_measurements.get(sensor_value.id).value} (${latest_measurements.get(sensor_value.id).datetime})|"/>
+        </td>
+        <td th:text="${sensor_value.unit.name}"></td>
+        <td th:text="${sensor_value.id}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
