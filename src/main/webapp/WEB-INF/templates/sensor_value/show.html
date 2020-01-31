@@ -7,11 +7,15 @@
             src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.6.0/echarts.min.js" integrity="undefined" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
 <div th:replace="/fragments/app.html :: navbar"></div>
 <div class="container">
-    <h1 th:text="${sensor_value.name}"></h1>
+
+    <h3 th:text="|${sensor_value.sensor.device.name}: ${sensor_value.sensor.name}|"></h3>
+    <h4 th:text="${sensor_value.name}"></h4>
     <div th:replace="/sensor_value/_sensor_measurement_chart :: chart"></div>
 </div>
 </body>

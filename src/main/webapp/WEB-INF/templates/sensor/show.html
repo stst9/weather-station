@@ -6,6 +6,7 @@
 <body>
 <div th:replace="/fragments/app.html :: navbar"></div>
 <div class="container">
+    <h3 th:text="|${sensor.device.name}: ${sensor.name}|"></h3>
     <div th:replace="/sensor/_sensor_value_list:: sensor_value_table"></div>
 </div>
 </body>

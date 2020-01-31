@@ -29,7 +29,11 @@ public class DeviceController {
     @RequestMapping("/{id}")
     public String show(Model model, @PathVariable String id){
         Optional<Device> deviceOptional=deviceDAO.findById(Integer.parseInt(id));
-        deviceOptional.ifPresent(device -> model.addAttribute("sensors", sensorDAO.findAllByDevice(device)));
+        if (deviceOptional.isPresent()){
+            Device device=deviceOptional.get();
+            model.addAttribute("sensors", sensorDAO.findAllByDevice(device));
+            model.addAttribute("device",device);
+        }
         return "/device/show";
     }
 }

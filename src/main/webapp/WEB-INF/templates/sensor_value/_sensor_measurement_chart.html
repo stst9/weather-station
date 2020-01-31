@@ -6,10 +6,12 @@
 </head>
 <body>
 <th:block th:fragment="chart">
-    <canvas id="myChart" width="1600" height="900"></canvas>
+    <!--<canvas id="myChart" width="1600" height="900"></canvas>
+    <div id="chart" style="width: 1600px;height:900px;"></div>-->
+    <div id="chart"></div>
     <script th:inline="javascript">
         /*<![CDATA[*/
-        $(document).ready(function () {
+        /*$(document).ready(function () {
             var myChart = new Chart($("#myChart"), {
                 type: 'line',
                 data: {
@@ -20,7 +22,83 @@
                     }]
                 }
             });
-        })
+        });
+        var myChart = echarts.init(document.getElementById('main'));
+        option = {
+            xAxis: {
+                type: 'value',
+                data: [(${chart_labels})]
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [(${chart_data})],
+                type: 'line'
+            }]
+        };
+        myChart.setOption(option);*/
+
+        var options = {
+            series: [{
+                name: "",
+                data: [(${chart_data})]
+            }],
+            chart: {
+                //height: 350,
+                type: 'line',
+                zoom: {
+                    type: 'x',
+                    enabled: false,
+                    autoScaleYaxis: true
+                },
+                toolbar: {
+                    autoSelected: 'zoom'
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            /*
+            title: {
+                text: 'Product Trends by Month',
+                align: 'left'
+            },*/
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            yaxis:{
+                title: {
+                    text: '[(${sensor_value.unit.name})]'
+                }/*,
+                labels: {
+                    formatter: function (val) {
+                        return '[(${sensor_value.unit.prefix})] '+val+' [(${sensor_value.unit.suffix})]';
+                    },
+                }*/
+            },
+            xaxis: {
+                type: 'datetime',
+                categories: [(${chart_labels})],
+            },
+            tooltip: {
+                shared: false,
+                x: {
+                    formatter: function (val) {
+                        return new Date(val).toLocaleString();
+                    }
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
         /*]]>*/
     </script>
 </th:block>

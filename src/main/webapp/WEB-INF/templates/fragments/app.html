@@ -12,9 +12,9 @@
 <body>
 <nav th:fragment="navbar">
     <div class="nav-wrapper">
-        <a href="#" class="brand-logo">Logo</a>
+        <a href="#" class="brand-logo">Weather Station</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="/devices">Devices</a></li>
+            <li><a th:href="@{/device/}">Devices</a></li>
         </ul>
     </div>
 </nav>
