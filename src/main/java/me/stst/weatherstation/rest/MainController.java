@@ -12,6 +12,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 @Path("control")
+@Secured
 public class MainController {
     EntityManagerFactory entityManagerFactory= MainStorage.getInstance().getSessionFactory();
 

@@ -1,8 +1,10 @@
 package me.stst.weatherstation.rest;
 
+import me.stst.weatherstation.domain.ApiToken;
 import me.stst.weatherstation.domain.SensorMeasurement;
 import me.stst.weatherstation.domain.SensorMeasurementRT;
 import me.stst.weatherstation.domain.SensorValue;
+import me.stst.weatherstation.repository.ApiTokenDAO;
 import me.stst.weatherstation.repository.SensorMeasurementDAO;
 import me.stst.weatherstation.repository.SensorMeasurementRTDAO;
 import me.stst.weatherstation.repository.SensorValueDAO;
@@ -15,13 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
 @Path("sensor_measurement_rt")
 @Controller
+@Secured
 public class SensorMeasurementRTController {
 
     @Autowired
@@ -30,20 +35,24 @@ public class SensorMeasurementRTController {
     private SensorMeasurementRTDAO sensorMeasurementRTDAO;
     @Autowired
     private SensorMeasurementDAO sensorMeasurementDAO;
+    @Autowired
+    private ApiTokenDAO apiTokenDAO;
 
     @POST
     @Transactional
-    public Response newSensorValue(RestSensorMeasurement in){
+    public Response newSensorValue(RestSensorMeasurement in,
+                                   @Context SecurityContext securityContext){
         Response ret= Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        ApiToken token=apiTokenDAO.findByToken(securityContext.getUserPrincipal().getName());
         try {
             Optional<SensorValue> sensorValueOpt=sensorValueDAO.findById(in.getSensorValueId());
-            if (sensorValueOpt.isPresent()){
-                SensorMeasurementRT sensorMeasurement=new SensorMeasurementRT();
-                sensorMeasurement.setSensorValue(sensorValueOpt.get());
-                sensorMeasurement.setDatetime(new Date(in.getTimestamp()));
-                sensorMeasurement.setValue(in.getValue());
-                sensorMeasurement.setTimezone(TimeZone.getDefault().getRawOffset()/60000);
-                sensorMeasurementRTDAO.save(sensorMeasurement);
+            if (sensorValueOpt.isPresent()&&token.getDevice().getId()==sensorValueOpt.get().getSensor().getDevice().getId()){
+                SensorMeasurementRT sensorMeasurementRT=new SensorMeasurementRT();
+                sensorMeasurementRT.setSensorValue(sensorValueOpt.get());
+                sensorMeasurementRT.setDatetime(new Date(in.getTimestamp()));
+                sensorMeasurementRT.setValue(in.getValue());
+                sensorMeasurementRT.setTimezone(TimeZone.getDefault().getRawOffset()/60000);
+                sensorMeasurementRTDAO.save(sensorMeasurementRT);
                 ret= Response.ok().build();
             }else {
                 ret= Response.status(404).build();

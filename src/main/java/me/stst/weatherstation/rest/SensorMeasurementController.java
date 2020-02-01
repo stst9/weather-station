@@ -1,8 +1,10 @@
 package me.stst.weatherstation.rest;
 
 import me.stst.weatherstation.MainStorage;
+import me.stst.weatherstation.domain.ApiToken;
 import me.stst.weatherstation.domain.SensorMeasurement;
 import me.stst.weatherstation.domain.SensorValue;
+import me.stst.weatherstation.repository.ApiTokenDAO;
 import me.stst.weatherstation.repository.SensorMeasurementDAO;
 import me.stst.weatherstation.repository.SensorValueDAO;
 import me.stst.weatherstation.rest.model.RestSensorMeasurement;
@@ -20,32 +22,38 @@ import javax.persistence.TypedQuery;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.util.Date;
 import java.util.Optional;
 import java.util.TimeZone;
 
-//@Path("sensor_measurement")
+@Path("sensor_measurement")
 @Controller
-@Deprecated
+@Secured
 public class SensorMeasurementController {
     //private SessionFactory sessionFactory= MainStorage.getInstance().getSessionFactory();
     @Autowired
     private SensorValueDAO sensorValueDAO;
     @Autowired
     private SensorMeasurementDAO sensorMeasurementDAO;
+    @Autowired
+    private ApiTokenDAO apiTokenDAO;
     @GET
     public Response getBySensorValue(){
         return Response.ok().build();
     }
 
-    //@POST
+    @POST
     @Transactional
-    public Response newSensorValue(RestSensorMeasurement in){
+    public Response newSensorValue(RestSensorMeasurement in,
+                                   @Context SecurityContext securityContext){
         Response ret= Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        ApiToken token=apiTokenDAO.findByToken(securityContext.getUserPrincipal().getName());
         try {
             Optional<SensorValue> sensorValueOpt=sensorValueDAO.findById(in.getSensorValueId());
-            if (sensorValueOpt.isPresent()){
+            if (sensorValueOpt.isPresent()&&token.getDevice().getId()==sensorValueOpt.get().getSensor().getDevice().getId()){
                 SensorMeasurement sensorMeasurement=new SensorMeasurement();
                 sensorMeasurement.setSensorValue(sensorValueOpt.get());
                 sensorMeasurement.setDatetime(new Date(in.getTimestamp()));
