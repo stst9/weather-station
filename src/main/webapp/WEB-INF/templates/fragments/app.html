@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Weather Station</title>
     <!-- Compiled and minified CSS -->
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
     <!-- Compiled and minified JavaScript -->
@@ -15,8 +19,22 @@
         <a href="#" class="brand-logo">Weather Station</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
             <li><a th:href="@{/device/}">Devices</a></li>
+            <li>
+                <form th:action="@{/logout}" method="post" id="nav-sign-out">
+                    <a id="nav-sign-out-link">Sign out</a>
+                    <input type="hidden" name="_submit" value="Sign Out"/>
+                </form>
+            </li>
         </ul>
     </div>
+    <script>
+        $(document).ready(function () {
+            $('#nav-sign-out-link').click(function () {
+                document.getElementById("nav-sign-out").submit();
+                return true;
+            });
+        })
+    </script>
 </nav>
 </body>
 </html>
