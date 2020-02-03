@@ -18,12 +18,11 @@
     <tr th:each="sensor_value : ${sensor_values}">
         <td><a th:text="${sensor_value.name}" th:href="@{/sensor_value/{id}(id=${sensor_value.id})}"></a></td>
         <td th:class="sv-latest-measurement" th:attr="data-sv-id=${sensor_value.id}">
-            <th:block th:if="${latest_measurements.get(sensor_value.id)!=null}"
-                      th:text="">
-                <span th:text="${sensor_value.unit.prefix}"></span>
-                <span th:text="| ${latest_measurements.get(sensor_value.id).value} |"></span>
-                <span th:text="${sensor_value.unit.suffix}"></span>
-                <span th:text="| (${latest_measurements.get(sensor_value.id).datetime})|"></span>
+            <th:block th:if="${latest_measurements.get(sensor_value.id)!=null}">
+                <span th:text="|${sensor_value.unit.prefix} |"></span>
+                <span th:text="${latest_measurements.get(sensor_value.id).value}" th:id="|sv-latest-measurement-value-${sensor_value.id}|"></span>
+                <span th:text="| ${sensor_value.unit.suffix} |"></span>
+                <span th:text="|(${latest_measurements.get(sensor_value.id).datetime})|" th:id="|sv-latest-measurement-timestamp-${sensor_value.id}|"></span>
             </th:block>
         </td>
         <td th:text="${sensor_value.unit.name}"></td>
