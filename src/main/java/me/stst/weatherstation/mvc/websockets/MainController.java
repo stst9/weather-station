@@ -31,7 +31,7 @@ public class MainController {
 
 
 
-    @MessageMapping("/sensor_value")
+    //@MessageMapping("/sensor_value")
     //@SendTo("/topic/sensor_value")
     public void getSensorValueRT(String id, Principal principal){
         this.template.convertAndSendToUser(principal.getName(),"/topic/sensor_value",
@@ -40,12 +40,12 @@ public class MainController {
     }
 
     public void sendUpdate(SensorMeasurement measurement) {
-        System.out.println("Fire");
+        /*System.out.println("Fire");
         this.template.convertAndSend("/topic/sensor_value", measurement);
         this.template.convertAndSend("/queue/sensor_value", measurement);
         this.template.convertAndSend("/topic/sensor_value", "abc");
         this.template.convertAndSend("/queue/sensor_value", "def");
 
-        System.out.println("Fired");
+        System.out.println("Fired");*/
     }
 }

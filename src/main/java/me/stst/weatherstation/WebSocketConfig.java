@@ -17,6 +17,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/weather_station");
-        //registry.addEndpoint("/weather_station").withSockJS();
+        registry.addEndpoint("/weather_station").withSockJS();
     }
 }

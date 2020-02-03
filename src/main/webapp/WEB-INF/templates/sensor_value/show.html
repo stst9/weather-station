@@ -32,7 +32,7 @@
         function connect() {
             var rtValue=$('#rt-value');
             var svId=$('#rt-value-container').data("sensor-value-id");
-            var socket = new WebSocket('ws://localhost:8081/weather_station_war/weather_station');
+            var socket = new SockJS('[(@{/weather_station})]');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function(frame) {
                 //setConnected(true);
@@ -41,7 +41,6 @@
                     console.log((messageOutput.body));
                     rtValue.text(JSON.parse(messageOutput.body).value)
                 });
-                sendMessage();
             });
         }
         $(document).ready(function () {
