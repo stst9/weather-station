@@ -5,19 +5,17 @@ import me.stst.weatherstation.domain.Device;
 import me.stst.weatherstation.domain.Sensor;
 import me.stst.weatherstation.domain.SensorValue;
 import me.stst.weatherstation.domain.Unit;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 
-@Path("control")
-@Secured
+@RestController("/rest/control")
 public class MainController {
     EntityManagerFactory entityManagerFactory= MainStorage.getInstance().getSessionFactory();
 
-    @Path("seed_units")
-    @GET
+    @GetMapping("seed_units")
     public Boolean seedUnits(){
         boolean ret=false;
         EntityManager entityManager=entityManagerFactory.createEntityManager();
@@ -38,8 +36,7 @@ public class MainController {
         return ret;
     }
 
-    @GET
-    @Path("seed_test_dev")
+    @GetMapping("seed_test_dev")
     public Boolean seedArduino(){
         EntityManager entityManager=entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();

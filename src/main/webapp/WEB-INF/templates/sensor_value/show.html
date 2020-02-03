@@ -12,7 +12,54 @@
 
     <h3 th:text="|${sensor_value.sensor.device.name}: ${sensor_value.sensor.name}|"></h3>
     <h4 th:text="${sensor_value.name}"></h4>
+    <div th:attr="data-sensor-value-id=${sensor_value.id}" id="rt-value-container">
+        <span>Latest value: <b id="rt-value"></b></span>
+    </div>
     <div th:replace="/sensor_value/_sensor_measurement_chart :: chart"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js" integrity="sha256-z4cKT3yF+afIn8eFXJc+nRpGtwcmNEClvf+ikgsZcRo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha256-nkP8cj5xaTdWK/BsZl+57ZCE/Y/i4UNtbNTpgH+6Taw=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        var stompClient = null;
+
+        /*function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('conversationDiv').style.visibility
+                = connected ? 'visible' : 'hidden';
+            document.getElementById('response').innerHTML = '';
+        }*/
+
+        function connect() {
+            var rtValue=$('#rt-value');
+            var svId=$('#rt-value-container').data("sensor-value-id");
+            var socket = new WebSocket('ws://localhost:8081/weather_station_war/weather_station');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                //setConnected(true);
+                console.log('Connected: ' + frame);
+                stompClient.subscribe("/topic/sensor_value/"+svId, function(messageOutput) {
+                    console.log((messageOutput.body));
+                    rtValue.text(JSON.parse(messageOutput.body).value)
+                });
+                sendMessage();
+            });
+        }
+        $(document).ready(function () {
+            connect();
+        });
+
+        function disconnect() {
+            if(stompClient != null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+
+        function sendMessage() {
+            stompClient.send("/app/sensor_value", {},"1");
+        }
+    </script>
 </div>
 </body>
 </html>

@@ -3,6 +3,7 @@ package me.stst.weatherstation.mvc;
 import com.google.gson.Gson;
 import me.stst.weatherstation.domain.SensorMeasurement;
 import me.stst.weatherstation.domain.SensorValue;
+import me.stst.weatherstation.mvc.websockets.MainController;
 import me.stst.weatherstation.repository.SensorMeasurementDAO;
 import me.stst.weatherstation.repository.SensorValueDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/sensor_value")
 public class SensorValueController {
+    @Autowired
+    private MainController mainController;
     private Gson gson=new Gson();
 
     @Autowired
@@ -40,6 +43,7 @@ public class SensorValueController {
             }
             model.addAttribute("chart_labels",gson.toJson(labels));
             model.addAttribute("chart_data",gson.toJson(data));
+            mainController.sendUpdate(measurementList.get(0));
         }
         return "sensor_value/show";
     }

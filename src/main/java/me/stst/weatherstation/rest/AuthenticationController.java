@@ -1,19 +1,18 @@
 package me.stst.weatherstation.rest;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
 
 @Controller
-@Path("/auth")
+@RestController("/rest/auth")
 public class AuthenticationController {
 
-    @GET
-    @Path("generate_token")
-    public Response generateToken(){
-        return Response.ok(RandomStringUtils.random(200,true,true)).build();
+    @GetMapping("generate_token")
+    public ResponseEntity generateToken(){
+        return ResponseEntity.ok(RandomStringUtils.random(200,true,true));
     }
 }

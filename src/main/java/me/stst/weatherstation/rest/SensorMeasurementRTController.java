@@ -4,29 +4,30 @@ import me.stst.weatherstation.domain.ApiToken;
 import me.stst.weatherstation.domain.SensorMeasurement;
 import me.stst.weatherstation.domain.SensorMeasurementRT;
 import me.stst.weatherstation.domain.SensorValue;
+import me.stst.weatherstation.mvc.websockets.MainController;
 import me.stst.weatherstation.repository.ApiTokenDAO;
 import me.stst.weatherstation.repository.SensorMeasurementDAO;
 import me.stst.weatherstation.repository.SensorMeasurementRTDAO;
 import me.stst.weatherstation.repository.SensorValueDAO;
 import me.stst.weatherstation.rest.model.RestSensorMeasurement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.Principal;
 import java.util.*;
 
-@Path("sensor_measurement_rt")
+@RestController()
+@RequestMapping("/rest/sensor_measurement_rt")
 @Controller
-@Secured
 public class SensorMeasurementRTController {
 
     @Autowired
@@ -37,13 +38,17 @@ public class SensorMeasurementRTController {
     private SensorMeasurementDAO sensorMeasurementDAO;
     @Autowired
     private ApiTokenDAO apiTokenDAO;
+    @Autowired
+    private SimpMessagingTemplate template;
+    @Autowired
+    private MainController mainController;
 
-    @POST
+    @PostMapping
     @Transactional
-    public Response newSensorValue(RestSensorMeasurement in,
-                                   @Context SecurityContext securityContext){
-        Response ret= Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        ApiToken token=apiTokenDAO.findByToken(securityContext.getUserPrincipal().getName());
+    public ResponseEntity newSensorValueRT(@RequestBody RestSensorMeasurement in,
+                                         Principal principal){
+        ResponseEntity ret= ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        ApiToken token=apiTokenDAO.findByToken(principal.getName());
         try {
             Optional<SensorValue> sensorValueOpt=sensorValueDAO.findById(in.getSensorValueId());
             if (sensorValueOpt.isPresent()&&token.getDevice().getId()==sensorValueOpt.get().getSensor().getDevice().getId()){
@@ -53,9 +58,10 @@ public class SensorMeasurementRTController {
                 sensorMeasurementRT.setValue(in.getValue());
                 sensorMeasurementRT.setTimezone(TimeZone.getDefault().getRawOffset()/60000);
                 sensorMeasurementRTDAO.save(sensorMeasurementRT);
-                ret= Response.ok().build();
+                ret= ResponseEntity.ok().build();
+                template.convertAndSend("/topic/sensor_value/"+sensorValueOpt.get().getId(),in);
             }else {
-                ret= Response.status(404).build();
+                ret= ResponseEntity.status(404).build();
             }
         }finally {
 
@@ -64,9 +70,15 @@ public class SensorMeasurementRTController {
 
     }
 
+    @GetMapping
+    @ResponseBody
+    String test(){
+        return "test";
+    }
+
     @Async
     @Transactional
-    @Scheduled(fixedRate = 1000)
+    //@Scheduled(fixedRate = 1000)
     public void calculateAverages(){
         Calendar calendar=Calendar.getInstance();
         calendar.add(Calendar.MINUTE,-1);

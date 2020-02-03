@@ -12,26 +12,25 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import java.security.Principal;
 import java.util.Date;
 import java.util.Optional;
 import java.util.TimeZone;
 
-@Path("sensor_measurement")
+@RestController()
+@RequestMapping("/rest/sensor_measurement")
 @Controller
-@Secured
 public class SensorMeasurementController {
     //private SessionFactory sessionFactory= MainStorage.getInstance().getSessionFactory();
     @Autowired
@@ -40,17 +39,15 @@ public class SensorMeasurementController {
     private SensorMeasurementDAO sensorMeasurementDAO;
     @Autowired
     private ApiTokenDAO apiTokenDAO;
-    @GET
-    public Response getBySensorValue(){
-        return Response.ok().build();
-    }
+    @Autowired
+    private SimpMessagingTemplate template;
 
-    @POST
+    @PostMapping
     @Transactional
-    public Response newSensorValue(RestSensorMeasurement in,
-                                   @Context SecurityContext securityContext){
-        Response ret= Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        ApiToken token=apiTokenDAO.findByToken(securityContext.getUserPrincipal().getName());
+    public ResponseEntity newSensorValue(@RequestBody RestSensorMeasurement in,
+                                         Principal principal){
+        ResponseEntity ret= ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        ApiToken token=apiTokenDAO.findByToken(principal.getName());
         try {
             Optional<SensorValue> sensorValueOpt=sensorValueDAO.findById(in.getSensorValueId());
             if (sensorValueOpt.isPresent()&&token.getDevice().getId()==sensorValueOpt.get().getSensor().getDevice().getId()){
@@ -60,9 +57,10 @@ public class SensorMeasurementController {
                 sensorMeasurement.setValue(in.getValue());
                 sensorMeasurement.setTimezone(TimeZone.getDefault().getRawOffset()/60000);
                 sensorMeasurementDAO.save(sensorMeasurement);
-                ret= Response.ok().build();
+                ret= ResponseEntity.ok().build();
+                template.convertAndSend("/topic/sensor_value/"+sensorValueOpt.get().getId(),in);
             }else {
-                ret= Response.status(404).build();
+                ret= ResponseEntity.status(404).build();
             }
         }finally {
 
