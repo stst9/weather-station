@@ -78,7 +78,7 @@ public class SensorMeasurementRTController {
 
     @Async
     @Transactional
-    //@Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 1000)
     public void calculateAverages(){
         Calendar calendar=Calendar.getInstance();
         calendar.add(Calendar.MINUTE,-1);

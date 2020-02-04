@@ -1,4 +1,4 @@
-package me.stst.weatherstation.rest.security;
+package me.stst.weatherstation.security.rest;
 
 import me.stst.weatherstation.repository.ApiTokenDAO;
 import org.apache.commons.lang3.StringUtils;

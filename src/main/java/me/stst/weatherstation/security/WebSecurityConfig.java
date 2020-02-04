@@ -1,8 +1,9 @@
-package me.stst.weatherstation.mvc;
+package me.stst.weatherstation.security;
 
+import me.stst.weatherstation.mvc.SpringAuthenticationProvider;
 import me.stst.weatherstation.repository.ApiTokenDAO;
 import me.stst.weatherstation.repository.UserDAO;
-import me.stst.weatherstation.rest.security.AuthenticationFilter;
+import me.stst.weatherstation.security.rest.AuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +16,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;

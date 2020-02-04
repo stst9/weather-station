@@ -1,21 +1,14 @@
-package me.stst.weatherstation.rest.security;
+package me.stst.weatherstation.security.rest;
 
 import me.stst.weatherstation.domain.ApiToken;
-import me.stst.weatherstation.domain.User;
 import me.stst.weatherstation.repository.ApiTokenDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 
-import javax.annotation.Priority;
-
-import java.io.IOException;
-import java.security.Principal;
 import java.util.ArrayList;
 
 
