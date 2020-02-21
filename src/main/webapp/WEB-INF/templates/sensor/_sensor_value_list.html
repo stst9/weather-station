@@ -30,5 +30,65 @@
     </tr>
     </tbody>
 </table>
+<table th:fragment="sensor_value_table_comp(sensor_values)">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Latest measurement</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="sensor_value : *{__${sensor_values}__}">
+        <td><a th:text="${sensor_value.name}" th:href="@{/sensor_value/{id}(id=${sensor_value.id})}"></a></td>
+        <td th:class="sv-latest-measurement" th:attr="data-sv-id=${sensor_value.id}">
+            <th:block th:if="${latest_measurements.get(sensor_value.id)!=null}">
+                <span th:text="|${sensor_value.unit.prefix} |"></span>
+                <span th:text="${latest_measurements.get(sensor_value.id).value}" th:id="|sv-latest-measurement-value-${sensor_value.id}|"></span>
+                <span th:text="| ${sensor_value.unit.suffix} |"></span>
+                <span th:text="|(${latest_measurements.get(sensor_value.id).datetime})|" th:id="|sv-latest-measurement-timestamp-${sensor_value.id}|"></span>
+            </th:block>
+        </td>
+    </tr>
+    <!--<tr>
+        <td>ABC</td>
+    </tr>
+    <tr>
+        <td>ABC</td>
+    </tr>
+    <tr>
+        <td>ABC</td>
+    </tr>-->
+    </tbody>
+</table>
+<script type="application/javascript" th:fragment="sensor_value_ws">
+    /*<![CDATA[*/
+    $(document).ready(function () {
+        function connect() {
+            var sv_ids = [];
+            $('.sv-latest-measurement').each(function (index) {
+                var element=$(this);
+                sv_ids.push(element.data('sv-id'))
+            });
+            var socket = new SockJS('[(@{/weather_station})]');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                //setConnected(true);
+                console.log('Connected: ' + frame);
+                $(sv_ids).each(function () {
+                    stompClient.subscribe("/topic/sensor_value/"+this, function(messageOutput) {
+                        var data=JSON.parse(messageOutput.body);
+                        console.log((messageOutput.body));
+                        $('#sv-latest-measurement-value-'+data.sensorValueId).text(Math.round(data.value * 10000) / 10000);
+                        var timestamp=new Date(data.timestamp).toISOString().slice(0, 19).replace('T', ' ');
+                        $('#sv-latest-measurement-timestamp-'+data.sensorValueId).text("("+timestamp+")")
+                    });
+                })
+            });
+        }
+        connect();
+    })
+
+    /*]]>*/
+</script>
 </body>
 </html>

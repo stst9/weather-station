@@ -21,5 +21,20 @@
     </tr>
     </tbody>
 </table>
+<div th:fragment="sensor_card" class="row">
+    <div th:each="sensor : ${sensors}" class="col s12 m6">
+        <div class="card">
+            <!--<<div class="card-image">
+                <img src="https://cdn.shopify.com/s/files/1/0174/1800/products/bme280-breakout-1_1024x1024.jpg?v=1564143478">
+                <span class="card-title">Card Title</span>
+            </div> -->
+            <div class="card-content" style="overflow: scroll">
+                <span class="card-title"><a th:text="|${sensor.name} (${sensor.model})|" th:href="@{/sensor/{id}(id=${sensor.id})}"></a></span>
+                <div th:insert="/sensor/_sensor_value_list :: sensor_value_table_comp('sensor.sensorValues')"></div>
+            </div>
+        </div>
+    </div>
+    <th:block th:replace="/sensor/_sensor_value_list :: sensor_value_ws"/>
+</div>
 </body>
 </html>

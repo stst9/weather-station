@@ -59,6 +59,7 @@ public class SensorMeasurementRTController {
                 sensorMeasurementRT.setTimezone(TimeZone.getDefault().getRawOffset()/60000);
                 sensorMeasurementRTDAO.save(sensorMeasurementRT);
                 ret= ResponseEntity.ok().build();
+                in.setValue(sensorMeasurementRT.getValue());
                 template.convertAndSend("/topic/sensor_value/"+sensorValueOpt.get().getId(),in);
             }else {
                 ret= ResponseEntity.status(404).build();

@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,10 +29,12 @@ public class SensorValueController {
     private SensorMeasurementDAO sensorMeasurementDAO;
     @RequestMapping("/{id}")
     public String show(Model model, @PathVariable String id){
+        Calendar calendar=Calendar.getInstance();
+        calendar.add(Calendar.HOUR,-72);
         Optional<SensorValue> sensorValue=sensorValueDAO.findById(Integer.parseInt(id));
         if (sensorValue.isPresent()){
             model.addAttribute("sensor_value",sensorValue.get());
-            List<SensorMeasurement> measurementList=sensorMeasurementDAO.findAllBySensorValue(sensorValue.get());
+            List<SensorMeasurement> measurementList=sensorMeasurementDAO.findAllBySensorValueAndDatetimeAfter(sensorValue.get(),calendar.getTime());
             model.addAttribute("sensor_measurements",measurementList);
             String labels[]=new String[measurementList.size()];
             String data[]=new String[measurementList.size()];
@@ -43,7 +46,6 @@ public class SensorValueController {
             }
             model.addAttribute("chart_labels",gson.toJson(labels));
             model.addAttribute("chart_data",gson.toJson(data));
-            mainController.sendUpdate(measurementList.get(0));
         }
         return "sensor_value/show";
     }

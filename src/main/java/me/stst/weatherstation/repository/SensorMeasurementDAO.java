@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 import java.util.List;
 
 public interface SensorMeasurementDAO extends JpaRepository<SensorMeasurement,SensorMeasurement.SensorMeasurementId> {
@@ -16,4 +17,6 @@ public interface SensorMeasurementDAO extends JpaRepository<SensorMeasurement,Se
     List<SensorMeasurement> findLatestBySensorValue(@Param("sensorValue") SensorValue value);
 
     List<SensorMeasurement> findAllBySensorValue(SensorValue value);
+
+    List<SensorMeasurement> findAllBySensorValueAndDatetimeAfter(SensorValue sensorValue, Date datetime);
 }

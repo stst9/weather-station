@@ -9,37 +9,6 @@
     <h3 th:text="|${sensor.device.name}: ${sensor.name}|"></h3>
     <div th:replace="/sensor/_sensor_value_list:: sensor_value_table"></div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js" integrity="sha256-z4cKT3yF+afIn8eFXJc+nRpGtwcmNEClvf+ikgsZcRo=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha256-nkP8cj5xaTdWK/BsZl+57ZCE/Y/i4UNtbNTpgH+6Taw=" crossorigin="anonymous"></script>
-<script type="application/javascript">
-    /*<![CDATA[*/
-    $(document).ready(function () {
-        function connect() {
-            var sv_ids = [];
-            $('.sv-latest-measurement').each(function (index) {
-                var element=$(this);
-                sv_ids.push(element.data('sv-id'))
-            });
-            var socket = new SockJS('[(@{/weather_station})]');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function(frame) {
-                //setConnected(true);
-                console.log('Connected: ' + frame);
-                $(sv_ids).each(function () {
-                    stompClient.subscribe("/topic/sensor_value/"+this, function(messageOutput) {
-                        var data=JSON.parse(messageOutput.body);
-                        console.log((messageOutput.body));
-                        $('#sv-latest-measurement-value-'+data.sensorValueId).text(data.value);
-                        var timestamp=new Date(data.timestamp).toUTCString();
-                        $('#sv-latest-measurement-timestamp-'+data.sensorValueId).text("("+timestamp+")")
-                    });
-                })
-            });
-        }
-        connect();
-    })
 
-    /*]]>*/
-</script>
 </body>
 </html>

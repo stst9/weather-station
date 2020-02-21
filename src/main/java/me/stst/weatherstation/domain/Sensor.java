@@ -1,6 +1,8 @@
 package me.stst.weatherstation.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "sensors")
@@ -20,6 +22,9 @@ public class Sensor {
     @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     @JoinColumn(name = "d_id", nullable = false)
     private Device device;
+
+    @OneToMany(mappedBy = "sensor")
+    private List<SensorValue> sensorValues=new ArrayList<>();
 
     public Sensor() {
     }
@@ -61,5 +66,9 @@ public class Sensor {
 
     public void setDevice(Device device) {
         this.device = device;
+    }
+
+    public List<SensorValue> getSensorValues() {
+        return sensorValues;
     }
 }
