@@ -6,6 +6,7 @@ import me.stst.weatherstation.domain.SensorMeasurement;
 import me.stst.weatherstation.domain.SensorValue;
 import me.stst.weatherstation.repository.ApiTokenDAO;
 import me.stst.weatherstation.repository.SensorMeasurementDAO;
+import me.stst.weatherstation.repository.SensorMeasurementRTDAO;
 import me.stst.weatherstation.repository.SensorValueDAO;
 import me.stst.weatherstation.rest.model.RestSensorMeasurement;
 import org.hibernate.Session;
@@ -38,6 +39,8 @@ public class SensorMeasurementController {
     @Autowired
     private SensorMeasurementDAO sensorMeasurementDAO;
     @Autowired
+    private SensorMeasurementRTDAO sensorMeasurementRTDAO;
+    @Autowired
     private ApiTokenDAO apiTokenDAO;
     @Autowired
     private SimpMessagingTemplate template;
@@ -67,5 +70,19 @@ public class SensorMeasurementController {
         }
         return ret;
 
+    }
+
+    @GetMapping(path = "{id}")
+    public ResponseEntity getLatestValue(@PathVariable Integer id){
+        ResponseEntity ret= ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        Optional<SensorValue> sensorValueOpt=sensorValueDAO.findById(id);
+        if (sensorValueOpt.isPresent()){
+            SensorValue sensorValue=sensorValueOpt.get();
+            SensorMeasurement measurement=sensorValue.getLatestMeasurement(sensorMeasurementDAO,sensorMeasurementRTDAO);
+            ret=ResponseEntity.ok(new RestSensorMeasurement(measurement));
+        }else {
+            ret=ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ret;
     }
 }

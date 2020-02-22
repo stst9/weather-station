@@ -13,7 +13,7 @@
     <h3 th:text="|${sensor_value.sensor.device.name}: ${sensor_value.sensor.name}|"></h3>
     <h4 th:text="${sensor_value.name}"></h4>
     <div th:attr="data-sensor-value-id=${sensor_value.id}" id="rt-value-container">
-        <span>Latest value: <b id="rt-value"></b></span>
+        <span>Latest value: <span id="rt-value"></span></span>
     </div>
     <div th:replace="/sensor_value/_sensor_measurement_chart :: chart"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js" integrity="sha256-z4cKT3yF+afIn8eFXJc+nRpGtwcmNEClvf+ikgsZcRo=" crossorigin="anonymous"></script>
