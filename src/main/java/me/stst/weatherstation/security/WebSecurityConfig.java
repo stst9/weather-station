@@ -69,6 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .requestMatchers(PROTECTED_URLS)
                     .authenticated()
                     .and()
+                    .antMatcher("/rest/**")
                     .csrf().disable()
                     .formLogin().disable()
                     .httpBasic().disable()
