@@ -16,8 +16,8 @@ public class ApiToken {
     private Device device;
 
     @ManyToOne
-    @JoinColumn(name = "at_creator")
-    private User creator;
+    @JoinColumn(name = "at_user")
+    private User user;
 
     @Column(name = "at_token")
     private String token;
@@ -38,12 +38,12 @@ public class ApiToken {
         this.device = device;
     }
 
-    public User getCreator() {
-        return creator;
+    public User getUser() {
+        return user;
     }
 
-    public void setCreator(User creator) {
-        this.creator = creator;
+    public void setUser(User creator) {
+        this.user = creator;
     }
 
     public String getToken() {

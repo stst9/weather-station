@@ -19,6 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -26,24 +27,25 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private UserDAO userDAO;
+    @Autowired
+    private ApiTokenDAO apiTokenDAO;
 
 
     @Configuration
     @Order(1)
-    public static class ApiWebSecurityConfig extends WebSecurityConfigurerAdapter{
-        @Autowired
-        private UserDAO userDAO;
-        @Autowired
-        private ApiTokenDAO apiTokenDAO;
-        private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
+    public class ApiWebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        private final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
                 new AntPathRequestMatcher("/rest/**")
         );
 
         AuthenticationProvider provider;
 
-        public ApiWebSecurityConfig(final AuthenticationProvider authenticationProvider) {
+        public ApiWebSecurityConfig() {
             super();
-            this.provider = authenticationProvider;
+            this.provider = new me.stst.weatherstation.security.rest.AuthenticationProvider(apiTokenDAO);
         }
 
         @Override
@@ -53,7 +55,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Override
         public void configure(final WebSecurity webSecurity) {
-            webSecurity.ignoring().antMatchers("/token/**");
         }
 
         @Override
@@ -63,11 +64,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .exceptionHandling()
                     .and()
-                    .authenticationProvider(provider)
-                    .addFilterBefore(authenticationFilter(), AnonymousAuthenticationFilter.class)
+                    //.authenticationProvider(provider)
+                    .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                     .authorizeRequests()
-                    .requestMatchers(PROTECTED_URLS)
-                    .authenticated()
+                    .antMatchers("/rest/**").authenticated()
                     .and()
                     .antMatcher("/rest/**")
                     .csrf().disable()
@@ -78,7 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Bean
         AuthenticationFilter authenticationFilter() throws Exception {
-            final AuthenticationFilter filter = new AuthenticationFilter(PROTECTED_URLS,apiTokenDAO);
+            final AuthenticationFilter filter = new AuthenticationFilter(PROTECTED_URLS);
             filter.setAuthenticationManager(authenticationManager());
             //filter.setAuthenticationSuccessHandler(successHandler());
             return filter;
@@ -92,23 +92,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Configuration
     @Order(2)
-    public static class ApiTokenSecurityConfig extends WebSecurityConfigurerAdapter{
+    public class ApiTokenSecurityConfig extends WebSecurityConfigurerAdapter {
 
-        @Autowired
-        private UserDAO userDAO;
+
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
                     .authorizeRequests()
-                    .anyRequest().authenticated()
+                    .antMatchers("/api-public/**").permitAll()
+                    .antMatchers("/**").authenticated()
                     .and()
                     .formLogin()
                     .loginPage("/auth/login")
                     .permitAll()
                     .and()
                     .logout()
-                    .permitAll();
+                    .permitAll()
+                    .and()
+                    .csrf()
+                    .ignoringAntMatchers("/api-public/**")
+            ;
         }
+
         @Override
         public void configure(AuthenticationManagerBuilder builder) throws Exception {
             builder.authenticationProvider(new SpringAuthenticationProvider(userDAO));

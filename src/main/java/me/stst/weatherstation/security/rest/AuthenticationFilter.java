@@ -21,11 +21,10 @@ import java.util.Optional;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 public class AuthenticationFilter  extends AbstractAuthenticationProcessingFilter {
-    private ApiTokenDAO apiTokenDAO;
 
-    public AuthenticationFilter(final RequestMatcher requiresAuth, ApiTokenDAO apiTokenDAO) {
+    public AuthenticationFilter(final RequestMatcher requiresAuth) {
+
         super(requiresAuth);
-        this.apiTokenDAO=apiTokenDAO;
     }
 
     @Override
@@ -33,12 +32,17 @@ public class AuthenticationFilter  extends AbstractAuthenticationProcessingFilte
 
         Optional tokenParam = Optional.ofNullable(httpServletRequest.getHeader(AUTHORIZATION)); //Authorization: Bearer TOKEN
         String token= httpServletRequest.getHeader(AUTHORIZATION);
-        token= StringUtils.removeStart(token, "Bearer").trim();
-        Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(token, token);
-        if (apiTokenDAO.findByToken(token)==null){
-            throw new BadCredentialsException("Unauthorised");
+        if (token!=null){
+            token= StringUtils.removeStart(token, "Bearer").trim();
+        }else {
+            token="";
         }
-        return new UsernamePasswordAuthenticationToken(token, token, new ArrayList<>());
+        Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(token, token);
+        return getAuthenticationManager().authenticate(requestAuthentication);
+        //Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(token, token);
+        //if (apiTokenDAO.findByToken(token)==null){
+        //    throw new BadCredentialsException("Unauthorised");
+        //}
 
     }
 

@@ -1,5 +1,8 @@
 package me.stst.weatherstation.domain;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
+
+import javax.naming.AuthenticationException;
 import javax.persistence.*;
 
 @Entity
@@ -8,10 +11,10 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "u_id",nullable = false)
+    @Column(name = "u_id", nullable = false)
     private int id;
 
-    @Column(name = "u_login",nullable = false, unique = true)
+    @Column(name = "u_login", nullable = false, unique = true)
     private String login;
 
     @Column(name = "u_email", nullable = false, unique = true)
@@ -50,5 +53,9 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean checkPassword(String pwd) {
+        return BCrypt.checkpw(pwd,this.password);
     }
 }
