@@ -12,7 +12,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 @RestController("/rest/control")
-public class MainController {
+@Deprecated
+public class ControlController {
     EntityManagerFactory entityManagerFactory= MainStorage.getInstance().getSessionFactory();
 
     @GetMapping("seed_units")
