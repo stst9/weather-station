@@ -33,7 +33,6 @@ public class AuthenticationController {
 
     @PostMapping()
     public ResponseEntity<RestGenericResponse<String>> getToken(@RequestBody RestAuthUser auth){
-        System.out.println("+");
         User user=userDAO.findByLogin(auth.getLogin());
         ResponseEntity responseEntity=ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         if (user!=null){

@@ -2,6 +2,7 @@ package me.stst.weatherstation.domain;
 
 import me.stst.weatherstation.repository.SensorMeasurementDAO;
 import me.stst.weatherstation.repository.SensorMeasurementRTDAO;
+import me.stst.weatherstation.rest.model.RestSensorValue;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
@@ -79,5 +80,9 @@ public class SensorValue {
             return sensorMeasurementRT.get(0).copyToSensorMeasurement();
         }
         return null;
+    }
+
+    public RestSensorValue toRestSensorValue(){
+        return new RestSensorValue(id,name,unit,sensor);
     }
 }

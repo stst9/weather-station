@@ -1,5 +1,7 @@
 package me.stst.weatherstation.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -14,6 +16,7 @@ public class SensorMeasurement {
     @Id
     @ManyToOne
     @JoinColumn(name = "sv_id",nullable = false)
+    @JsonIgnore
     private SensorValue sensorValue;
 
     @Id

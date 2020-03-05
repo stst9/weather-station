@@ -46,7 +46,6 @@ public class AuthenticationProvider extends AbstractUserDetailsAuthenticationPro
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        System.out.println("-");
         String username=authentication.getName();
         Object credentials=authentication.getCredentials();
         /*if (!(credentials instanceof String)){
@@ -61,7 +60,6 @@ public class AuthenticationProvider extends AbstractUserDetailsAuthenticationPro
 
     @Override
     protected UserDetails retrieveUser(String s, UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
-        System.out.println("+");
         Object token = usernamePasswordAuthenticationToken.getCredentials();
         if (token==null){
             throw new UsernameNotFoundException("No token provided");
